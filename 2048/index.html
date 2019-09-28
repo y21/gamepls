@@ -2,9 +2,70 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css?family=Ubuntu&display=swap" rel="stylesheet">
     <title>2048 Game</title>
+    <style>
+        canvas {
+            border: 1px solid grey;
+        }
+    </style>
 </head>
 <body>
+    <canvas width="600" height="600">
 
+    </canvas>
 </body>
+<script>
+    try {
+        void (function () {
+            const canvas = document.getElementsByTagName("canvas")[0];
+            const ctx = canvas.getContext("2d");
+            const ws = new WebSocket("wss://game.pls.today");
+            const states = {
+                WAITING: 0x0,
+                INGAME:  0x1,
+                P1:      0x2,
+                P2:      0x4
+            };
+            const game = {
+                state: states.WAITING
+            };
+
+            // Functions
+            function drawHeading() {
+                ctx.font = "50px Ubuntu";
+                ctx.fillText("2048", canvas.width / 2 - 60, 50);
+            }
+
+            function drawWaitingScreen() {
+                ctx.font = "35px Ubuntu";
+                ctx.fillText("Waiting for another player", 90, canvas.height / 2 - 40);
+            }
+
+            function drawGrid() {
+                ctx.moveTo(30, 150);
+                ctx.lineTo(canvas.width - 30, 150);
+                //TODO: add more lines
+                ctx.stroke();
+            }
+
+            function loop() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawHeading();
+
+                if (game.state === states.WAITING) {
+                    drawWaitingScreen();
+                } else {
+                    drawGrid();
+                }
+
+                window.requestAnimationFrame(loop);
+            }
+
+            window.requestAnimationFrame(loop);
+        })();
+    } catch(e) {
+        alert(e.toString());
+    }
+</script>
 </html>
