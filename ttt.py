@@ -94,7 +94,22 @@ class TTTBoard:
             return True
         return False
 
+class Game2048:
+    def __init__(self,p1,p2):
+        self.p1=p1
+        self.p2=p2
+        self.make_board()
+        self.finished=False
+        self.turn = p1 if random.randint(0,100)>50 else p2
 
+    def make_board(self):
+        self.board = [None] * 16  # 4x4
+
+    async def on_message(self,msg,pl):
+        pass
+
+    async def start_match(self):
+        pass
 
 boards = {
     "ttt": TTTBoard,
