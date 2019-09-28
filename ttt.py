@@ -94,8 +94,11 @@ class TTTBoard:
             return True
         return False
 
+
+
 boards = {
-    "ttt": TTTBoard
+    "ttt": TTTBoard,
+    "2048": Game2048
 }
 
 class Connection:
