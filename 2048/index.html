@@ -107,6 +107,25 @@
                 } else if (opcode === "3") { // game flow
                     if (data.charAt(1) === "0") {
                         game.state = states.INGAME | states.P1;
+                    } else if (data.charAt(1) === "1") {
+                        const direction = data.charAt(3);
+                        for (let i = 0; i < 4; ++i) {
+                            for (let j = 0; j < 4; ++j) {
+                                if (direction === "0" && i > 0 && grid[i-1][j] === grid[i][j]) {
+                                    grid[i][j] = 0;
+                                    grid[i-1][j] *= 2;
+                                } else if (direction === "1" && j < 3 && grid[i][j+1] === grid[i][j]) {
+                                    grid[i][j] = 0;
+                                    grid[i][j+1] *= 2;
+                                } else if (direction === "2" && i < 3 && grid[i+1][j] === grid[i][j]) {
+                                    grid[i][j] = 0;
+                                    grid[i+1][j] *= 2;
+                                } else if (direction === "3" && j > 0 && grid[i][j-1] === grid[i][j-1]) {
+                                    grid[i][j] = 0;
+                                    grid[i][j-1] *= 2;
+                                }
+                            }
+                        }
                     } else if (data.charAt(1) === "3") {
                         const index = parseInt(data.substr(2));
                         grid[Math.floor((grid.length*4) / (index/4))-1][(grid.length * 4)%(index/4)] = 2;
