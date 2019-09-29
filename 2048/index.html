@@ -28,13 +28,27 @@
                 P2:      0x4
             };
             const game = {
-                state: states.WAITING
+                state: states.INGAME | states.P1,
+                username: prompt("Username")
             };
-
+            if (game.username === null) {
+                ctx.font = "32px Ubuntu";
+                return ctx.fillText("No username given", 20, 40);
+            }
+            const grid = [[],[],[],[]];
+            // Init grid
+            for (let i = 0; i < 4; ++i) {
+                for (let j = 0; j < 4; ++j) {
+                    grid[i][j] = 0;
+                }
+            }
             // Functions
             function drawHeading() {
                 ctx.font = "50px Ubuntu";
-                ctx.fillText("2048", canvas.width / 2 - 60, 50);
+                ctx.fillText("2048", canvas.width / 2 - 80, 50);
+                ctx.fillStyle = "#2ecc71";
+                ctx.fillText("MP", canvas.width / 2 + 40, 50);
+                ctx.fillStyle = "black";
             }
 
             function drawWaitingScreen() {
@@ -43,10 +57,26 @@
             }
 
             function drawGrid() {
-                ctx.moveTo(30, 150);
-                ctx.lineTo(canvas.width - 30, 150);
-                //TODO: add more lines
+                ctx.font = "20px Ubuntu";
+                for (let i = 0; i < 4; ++i) { // i = x, j = y
+                    for (let j = 0; j < 4; ++j) {
+                        ctx.strokeRect(100 + (100 * i), 100 + (100 * j), 100, 100);
+                        if (grid[i][j] > 0) ctx.fillText(grid[i][j], 140 + (100 * i), 160 + (100 * j));
+                    }
+                }
                 ctx.stroke();
+            }
+
+            function showButtons() {
+                ctx.fillStyle = "#3498db";
+                ctx.fillRect(40, canvas.height - 50, 150, 40);
+                ctx.fillStyle = "white";
+                ctx.fillText("How to play", 60, canvas.height - 23);
+                ctx.fillStyle = "#3498db";
+                ctx.fillRect(canvas.width - 190, canvas.height - 50, 150, 40);
+                ctx.fillStyle = "white";
+                ctx.fillText("Leave", canvas.width - 140, canvas.height - 23); // change this thing
+                ctx.fillStyle = "black";
             }
 
             function loop() {
@@ -57,6 +87,7 @@
                     drawWaitingScreen();
                 } else {
                     drawGrid();
+                    showButtons();
                 }
 
                 window.requestAnimationFrame(loop);
