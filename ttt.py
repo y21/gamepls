@@ -98,18 +98,33 @@ class Game2048:
     def __init__(self,p1,p2):
         self.p1=p1
         self.p2=p2
-        self.make_board()
+        self.board = [None] * 16  # 4x4
         self.finished=False
         self.turn = p1 if random.randint(0,100)>50 else p2
 
-    def make_board(self):
-        self.board = [None] * 16  # 4x4
-
-    async def on_message(self,msg,pl):
-        pass
+    def on_message(self,msg,pl):
+        if msg[0] == "1":
+            if msg[1] == "0": # up
+                for i, element in enumerate(self.board):
+                    if i >= 4:
+                        if element == self.board[i-4]:
+                            self.board[i] = None
+                            self.board[i-4] *= 2
+            elif msg[1] == "1": # right
+              for i, element in enumerate(self.board):
+                    if i not in [3,7,11]: # not last column
+                        if element == self.board[i+1]:
+                            self.board[i] = None
+                            self.board[i+1] *= 2
 
     async def start_match(self):
-        pass
+        await self.p1.ws.send("2"+self.p2.name)
+        await self.p2.ws.send("2"+self.p1.name)
+        numIndex = random.randint(0, 15)
+        self.board[numIndex] = 2
+        await self.p1.ws.send("33" + str(numIndex))
+        await self.p2.ws.send("33" + str(numIndex))
+        await self.turn.ws.send("30")
 
 boards = {
     "ttt": TTTBoard,
