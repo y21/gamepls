@@ -111,11 +111,24 @@ class Game2048:
                             self.board[i] = None
                             self.board[i-4] *= 2
             elif msg[1] == "1": # right
-              for i, element in enumerate(self.board):
+                for i, element in enumerate(self.board):
                     if i not in [3,7,11]: # not last column
                         if element == self.board[i+1]:
                             self.board[i] = None
                             self.board[i+1] *= 2
+            elif msg[1] == "2":
+                for i, element in enumerate(self.board):
+                    if i < 8:
+                        if element == self.board[i+4]:
+                            self.board[i] = None
+                            self.board[i+4] *= 2
+            elif msg[1] == "3":
+              for i, element in enumerate(self.board):
+                    if i not in [0, 4, 8]:
+                        if element == self.board[i-1]:
+                            self.board[i] = None
+                            self.board[i-1] *= 2
+
 
     async def start_match(self):
         await self.p1.ws.send("2"+self.p2.name)
