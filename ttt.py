@@ -104,6 +104,11 @@ class Game2048:
 
     def on_message(self,msg,pl):
         if msg[0] == "1":
+            if pl is self.p1:
+                self.p2.ws.send("31"+msg[1]) # 31<direction>
+            elif pl is self.p2:
+                self.p1.ws.send("31"+msg[1])
+
             if msg[1] == "0": # up
                 for i, element in enumerate(self.board):
                     if i >= 4:
