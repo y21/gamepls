@@ -20,7 +20,7 @@
         void (function () {
             const canvas = document.getElementsByTagName("canvas")[0];
             const ctx = canvas.getContext("2d");
-            const ws = new WebSocket("wss://game.pls.today");
+            const ws = new WebSocket("wss://game.pls.today/2048/all");
             const states = {
                 WAITING: 0x0,
                 INGAME:  0x1,
@@ -29,7 +29,7 @@
             };
             const game = {
                 state: states.INGAME | states.P1,
-                username: prompt("Username")
+                username: "user" || prompt("Username") // todo: remove left operand
             };
             if (game.username === null) {
                 ctx.font = "32px Ubuntu";
@@ -94,9 +94,56 @@
             }
 
             window.requestAnimationFrame(loop);
+
+            ws.onmessage = ({ data }) => {
+                const opcode = data.charAt(0);
+                if (opcode === "0") // identify
+                    ws.send("0" + game.username);
+                else if (opcode === "1") // keepalive
+                    ws.send("1");
+                else if (opcode === "2") {  // found partner
+                    game.state = states.INGAME;
+                    alert("Found a partner: " + data.substr(1));
+                } else if (opcode === "3") { // game flow
+                    if (data.charAt(1) === "0") {
+                        game.state = states.INGAME | states.P1;
+                    } else if (data.charAt(1) === "3") {
+                        const index = parseInt(data.substr(2));
+                        grid[Math.floor((grid.length*4) / (index/4))-1][(grid.length * 4)%(index/4)] = 2;
+                    }
+                }
+            };
+
+            // Handle onclick event
+            canvas.addEventListener("click", ({ clientX, clientY }) => {
+                const x = clientX - 8,
+                    y = clientY - 8;
+
+                if (x >= 40 && y >= canvas.height - 50 && x <= 190 && y <= canvas.height - 10) {
+                    // How to play button
+                    alert("Use your arrow-keys to move the tiles. When two tiles with the same number touch, they merge into one.\n" +
+                        "In this version, you play in a team with another person.");
+                } else if (x >= canvas.width - 190 && y >= canvas.height - 50 && x <= canvas.width - 40 && y <= canvas.height - 10) {
+                    // Leave button
+                    ws.close();
+                }
+            });
+
+            window.addEventListener("keydown", ({ key }) => {
+                if (game.state !== (states.INGAME | states.P1)) return;
+                if (key === "ArrowLeft") {
+                    ws.send("313"); // left = 3
+                } else if (key === "ArrowRight") {
+                    ws.send("311"); // right = 1
+                } else if (key === "ArrowUp") {
+                    ws.send("310"); // up = 0
+                } else if (key === "ArrowDown") {
+                    ws.send("312") // down = 2
+                }
+            });
         })();
     } catch(e) {
-        alert(e.toString());
+        alert(e.stack);
     }
 </script>
 </html>
